@@ -1,0 +1,120 @@
+captainVersion: 4
+services:
+    $$cap_appname:
+        image: node:$$cap_node_version-alpine
+        command: ['npm', 'start']
+        environment:
+            NODE_ENV: $$cap_node_env
+            PORT: $$cap_node_port
+            # Add more environment variables as needed
+        volumes:
+            - $$cap_appname-app-data:/usr/src/app
+        restart: always
+        caproverExtra:
+            containerHttpPort: $$cap_node_port
+
+caproverOneClickApp:
+    variables:
+        - id: $$cap_node_version
+          label: Node.js Version
+          defaultValue: '20'
+          description: Specify the Node.js version to use. Check https://hub.docker.com/_/node for available tags.
+          validRegex: /^(\d+(\.\d+)*)$/
+        - id: $$cap_node_env
+          label: Node Environment
+          defaultValue: 'production'
+          description: Set the Node.js environment (e.g., development, production).
+          validRegex: /^(development|production|staging)$/
+        - id: $$cap_node_port
+          label: Application Port
+          defaultValue: '3000'
+          description: Specify the port your Node.js application listens on.
+          validRegex: /^([0-9]{1,5})$/
+        - id: $$cap_app_repo
+          label: Git Repository URL
+          defaultValue: 'https://github.com/yourusername/your-node-app.git'
+          description: Provide the Git repository URL of your Node.js application.
+          validRegex: /^https?:\/\/.+\.git$/
+        - id: $$cap_app_branch
+          label: Git Branch
+          defaultValue: 'main'
+          description: Specify the Git branch to deploy.
+          validRegex: /^([a-zA-Z0-9_\-]+)$/
+        - id: $$cap_app_start_command
+          label: Start Command
+          defaultValue: 'npm start'
+          description: Specify the command to start your Node.js application.
+          validRegex: /^(\S+)(\s+\S+)*$/
+    instructions:
+        start: >-
+            **Node.js Deployment Instructions**
+
+            This One-Click App deploys your Node.js application to CapRover. Follow these steps:
+
+            1. **Provide Repository Details:**
+               - **Git Repository URL:** Enter the URL of your Node.js application's Git repository.
+               - **Git Branch:** Specify the branch you want to deploy (e.g., `main`, `master`, `development`).
+
+            2. **Configure Application Settings:**
+               - **Node.js Version:** Choose the Node.js version compatible with your application.
+               - **Node Environment:** Set the environment (e.g., `production`).
+               - **Application Port:** Specify the port your application listens on (commonly `3000`).
+
+            3. **Start Command:**
+               - Define the command to start your application (default is `npm start`).
+
+            4. **Deploy:**
+               - Click **"Next"** to deploy your Node.js application. The deployment process will fetch your code, install dependencies, and start the application.
+
+            **Note:** Ensure your application's `package.json` has the correct `start` script defined.
+
+        end: >-
+            **Deployment Successful!**
+
+            Your Node.js application is now deployed and accessible at:
+
+            ```
+            https://$$cap_appname.your-caprover-domain.com
+            ```
+
+            **Connecting to Databases:**
+
+            If your application requires a database (e.g., MongoDB), you can link it using CapRover's services. For example, to connect to the MongoDB instance you deployed earlier:
+
+            ```javascript
+            mongoose.connect('mongodb://srv-captain--mongo:27017/yourdatabase', {
+              user: 'yourMongoUsername',
+              pass: 'yourMongoPassword',
+              useNewUrlParser: true,
+              useUnifiedTopology: true,
+              replicaSet: 'rs0'
+            });
+            ```
+
+            Replace `srv-captain--mongo` with the actual service name if different.
+
+            **Access Logs:**
+
+            To view your application's logs, navigate to the CapRover dashboard, select your app, and click on **"App Logs"**.
+
+            **Next Steps:**
+
+            - **Environment Variables:** Add any additional environment variables your application requires.
+            - **Scaling:** Use CapRover's scaling features to handle increased traffic by adjusting the number of instances.
+            - **Monitoring:** Implement monitoring and logging to keep track of your application's health and performance.
+
+    displayName: Node.js App
+    isOfficial: true
+    description: >
+        Deploy your Node.js applications effortlessly with customizable settings. Supports various Node.js versions, environment configurations, and seamless integration with other services.
+    documentation: >
+        Refer to the [Node.js Official Docker Image](https://hub.docker.com/_/node/) for more information on available tags and configurations. Ensure your application's `package.json` has the necessary scripts defined for deployment.
+    stack:
+        - nodejs
+        - javascript
+        - backend
+        - web
+
+volumes:
+    $$cap_appname-app-data:
+        external: false

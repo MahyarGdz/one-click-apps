@@ -5,6 +5,8 @@
         "COPY . /app",
         "WORKDIR /app",
         "RUN npm i",
+        "RUN npm run validate_apps",
+        "RUN npm run formatter-write",
         "RUN npm run build",
         "FROM nginx:mainline-alpine-slim",
         "COPY --from=build /app/dist /usr/share/nginx/html"
